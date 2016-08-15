@@ -350,7 +350,7 @@ Matcher::calcAdvance()
         
         distance_t distance;
         if (isMagnetWall(m_frameCount,index)) {
-            distance = m_metric.scaleValueIntoDistanceRange(10000);
+            distance = DISTANCE_MAX;
         }else{            
             distance = m_metric.calcDistance
                 (m_features[frameIndex],
