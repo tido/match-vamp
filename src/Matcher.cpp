@@ -349,14 +349,12 @@ Matcher::calcAdvance()
     for ( ; index < stop; index++) {
         
         distance_t distance;
-        if (getMagnetDist(m_frameCount,index) >= 0) {
-            distance = m_metric.scaleValueIntoDistanceRange(getMagnetDist(m_frameCount,index));
-            cerr << "FP" << (int) distance;
+        if (isMagnetWall(m_frameCount,index)) {
+            distance = m_metric.scaleValueIntoDistanceRange(10000);
         }else{            
             distance = m_metric.calcDistance
                 (m_features[frameIndex],
                  m_otherMatcher->m_features[index % m_blockSize]);
-            cerr << "--" << (int) distance;
         }
 
         pathcost_t straightIncrement(distance);
@@ -597,20 +595,21 @@ Matcher::printStats()
     }
 }
 
-int Matcher::getMagnetDist(int frameCount, int index){
-    double distance = -1;
+bool Matcher::isMagnetWall(int frameCount, int index){
+    bool result = false;
     for (auto point: m_magnets){
         int pIndex = point.second; //reference
         int pFrameCount = point.first; //other
         if (abs(index - pIndex) < 10 || abs(pFrameCount- frameCount) < 10){
             if (abs(index - pIndex) < 10 && abs(pFrameCount- frameCount) < 10){
                 cerr << "Fixpoint at " << "other: " << pFrameCount << " reference: "  <<  pIndex << " passed." << endl;
-                return 0;
+                //return 0;
+                return false; 
             }else{
-                distance = 10000;
+                result = true;
             }
         }  
     }
-    return distance;
+    return result;
 }
 
