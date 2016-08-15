@@ -21,6 +21,7 @@
 
 #include <cstdlib>
 #include <cassert>
+#include <vector>
 
 using namespace std;
 
@@ -76,6 +77,16 @@ Matcher::init()
     m_runCount = 0;
     
     m_initialised = true;
+    
+    // testing fixed fixpoint for clementi 6 cadenza (performance, reference)
+    m_magnets.push_back(std::make_pair((int) (5.590/m_params.hopTime), 
+            (int) (7.125/m_params.hopTime)));
+    
+    for (auto point: m_magnets){
+        int pIndex = point.second; //reference
+        int pFrameCount = point.first; //other
+        cerr << "Fixpoint at " << "other: " << pFrameCount << "reference: "  <<  pIndex << endl;
+    }
 }
 
 bool
@@ -336,10 +347,17 @@ Matcher::calcAdvance()
     m_last[m_frameCount] = stop;
 
     for ( ; index < stop; index++) {
-
-        distance_t distance = m_metric.calcDistance
-            (m_features[frameIndex],
-             m_otherMatcher->m_features[index % m_blockSize]);
+        
+        distance_t distance;
+        if (getMagnetDist(m_frameCount,index) >= 0) {
+            distance = m_metric.scaleValueIntoDistanceRange(getMagnetDist(m_frameCount,index));
+            cerr << "FP" << (int) distance;
+        }else{            
+            distance = m_metric.calcDistance
+                (m_features[frameIndex],
+                 m_otherMatcher->m_features[index % m_blockSize]);
+            cerr << "--" << (int) distance;
+        }
 
         pathcost_t straightIncrement(distance);
         pathcost_t diagIncrement = pathcost_t(distance * m_params.diagonalWeight);
@@ -577,5 +595,22 @@ Matcher::printStats()
              << endl;
         cerr << endl;
     }
+}
+
+int Matcher::getMagnetDist(int frameCount, int index){
+    double distance = -1;
+    for (auto point: m_magnets){
+        int pIndex = point.second; //reference
+        int pFrameCount = point.first; //other
+        if (abs(index - pIndex) < 10 || abs(pFrameCount- frameCount) < 10){
+            if (abs(index - pIndex) < 10 && abs(pFrameCount- frameCount) < 10){
+                cerr << "Fixpoint at " << "other: " << pFrameCount << " reference: "  <<  pIndex << " passed." << endl;
+                return 0;
+            }else{
+                distance = 10000;
+            }
+        }  
+    }
+    return distance;
 }
 

@@ -351,6 +351,14 @@ protected:
     bool m_initialised;
 
     DistanceMetric m_metric;
+    
+    /** Magnet points can stamp low or high distance into the matrix
+     * in order to pull the alignment towards these points
+     */
+    int getMagnetDist(int,int);
+    int m_magnetSiz = 10; // size of the magnets in frames
+    vector<std::pair<int,int >> m_magnets; // performance,reference fixpoints in frames
+    
 };
 
 inline Matcher::MemoryStats operator+(const Matcher::MemoryStats &a,
