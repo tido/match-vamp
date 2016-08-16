@@ -78,27 +78,8 @@ Matcher::init()
     
     m_offset = 0;
     m_magnetSiz = 10;
-
-    
     setMagnets(m_params.magnets);
-    
-    // testing fixed fixpoint for clementi 6 cadenza (performance, reference)
-    // canzonet
-    //m_magnets.push_back(std::make_pair((int) (5.590/m_params.hopTime), 
-    //        (int) (7.125/m_params.hopTime)));
-    
-    //clementi cadenza, need some offset of 2 seconds with silence suppressed .
-//    m_magnets.push_back(std::make_pair((int) (89.000/m_params.hopTime), 
-//        (int) (111.500/m_params.hopTime)));
-//    m_magnets.push_back(std::make_pair((int) (93.253/m_params.hopTime), 
-//        (int) (113.000/m_params.hopTime)));
-    
-    for (auto point: m_magnets){
-        int pIndex = point.second; //reference
-        int pFrameCount = point.first; //other
-        cerr << "Fixpoint at " << "other: " << pFrameCount << "reference: "  <<  pIndex << endl;
-    }
-    
+
     m_initialised = true;
 }
 
@@ -362,7 +343,7 @@ Matcher::calcAdvance()
     for ( ; index < stop; index++) {
         
         distance_t distance;
-        if (isMagnetWall(m_frameCount,index)) {
+        if (isMagnetWall(m_frameCount,index)) { // are we trying to sneak around a magnet ?
             distance = DISTANCE_MAX;
         }else{            
             distance = m_metric.calcDistance
@@ -612,6 +593,7 @@ void Matcher::setMagnets( std::vector<std::pair<int, int>> points){
     m_magnets.clear();
     for (auto point: points){
         m_magnets.push_back(point);
+        cerr << "Fixpoint at " << "other: " << point.second << "reference: "  << point.first << endl;
     }
 }
 
@@ -619,7 +601,6 @@ void Matcher::addOffset(int frames){
     m_offset += frames; 
 }
     
-
 bool Matcher::isMagnetWall(int frameCount, int index){
     bool result = false;
     for (auto point: m_magnets){
@@ -627,8 +608,7 @@ bool Matcher::isMagnetWall(int frameCount, int index){
         int pFrameCount = point.first; //other
         if (abs(index + m_offset - pIndex) < 10 || abs(pFrameCount - frameCount) < 10){
             if (abs(index + m_offset - pIndex) < 10 && abs(pFrameCount - frameCount) < 10){
-                cerr << "Fixpoint at " << "other: " << pFrameCount << " reference: "  <<  pIndex << " passed." << endl;
-                //return 0;
+                //cerr << "Fixpoint at " << "other: " << pFrameCount << " reference: "  <<  pIndex << " passed." << endl;
                 return false; 
             }else{
                 result = true;
