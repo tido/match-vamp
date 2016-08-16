@@ -78,12 +78,16 @@ Matcher::init()
     
     m_initialised = true;
     
-    // testing fixed fixpoint for canzonet/  clementi 6 cadenza (performance, reference)
+    // testing fixed fixpoint for clementi 6 cadenza (performance, reference)
+    // canzonet
     //m_magnets.push_back(std::make_pair((int) (5.590/m_params.hopTime), 
-    //        (int) (2.125/m_params.hopTime)));
-
-    m_magnets.push_back(std::make_pair((int) (91.253/m_params.hopTime), 
-            (int) (113.000/m_params.hopTime)));
+    //        (int) (7.125/m_params.hopTime)));
+    
+    //clementi cadenza, need some offset of 2 seconds with silence suppressed .
+    m_magnets.push_back(std::make_pair((int) (89.000/m_params.hopTime), 
+        (int) (111.500/m_params.hopTime)));
+    m_magnets.push_back(std::make_pair((int) (93.253/m_params.hopTime), 
+        (int) (113.000/m_params.hopTime)));
     
     for (auto point: m_magnets){
         int pIndex = point.second; //reference
@@ -352,8 +356,8 @@ Matcher::calcAdvance()
     for ( ; index < stop; index++) {
         
         distance_t distance;
-        if (isMagnetWall(m_frameCount,index) >= 0) {
-            distance = (distance_t) isMagnetWall(m_frameCount,index);
+        if (isMagnetWall(m_frameCount,index)) {
+            distance = DISTANCE_MAX;
         }else{            
             distance = m_metric.calcDistance
                 (m_features[frameIndex],
@@ -598,17 +602,18 @@ Matcher::printStats()
     }
 }
 
-double Matcher::isMagnetWall(int frameCount, int index){
-    double result = -1;
+bool Matcher::isMagnetWall(int frameCount, int index){
+    bool result = false;
     for (auto point: m_magnets){
         int pIndex = point.second; //reference
         int pFrameCount = point.first; //other
-        if (abs(index - pIndex) < m_magnetSiz || abs(pFrameCount- frameCount) < m_magnetSiz){
-            if (abs(index - pIndex) < m_magnetSiz && abs(pFrameCount- frameCount) < m_magnetSiz){
+        if (abs(index - pIndex) < 10 || abs(pFrameCount- frameCount) < 10){
+            if (abs(index - pIndex) < 10 && abs(pFrameCount- frameCount) < 10){
                 cerr << "Fixpoint at " << "other: " << pFrameCount << " reference: "  <<  pIndex << " passed." << endl;
-                return 0;
+                //return 0;
+                return false; 
             }else{
-                result = DISTANCE_WALL;
+                result = true;
             }
         }  
     }
