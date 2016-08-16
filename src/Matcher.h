@@ -54,7 +54,8 @@ public:
             hopTime(hopTime_),
             blockTime(10.0),
             maxRunCount(3),
-            diagonalWeight(2.0)
+            diagonalWeight(2.0),
+            magnets(std::vector<std::pair<int,int>> {})
         {}
 
         /** Spacing of audio frames (determines the amount of overlap or
@@ -86,6 +87,8 @@ public:
          *  might use 1.0 or something close to it.
          */
         double diagonalWeight;
+        
+        std::vector<std::pair<int,int>> magnets;
     };
 
     /** Constructor for Matcher.
@@ -273,6 +276,20 @@ public:
      */
     void printStats();
     
+    /** Sets Magnet points that will be preferred
+    * 
+    *  @param points linking an absolute frame position in this Matcher (performance)
+    *         to an absolute frame position in the other Matcher (reference)
+    */
+    void setMagnets(std::vector<std::pair<int, int>> points);
+    
+    /** To keep track with the frame feed and absolute magnet positions,
+     * an offset of the other matcher (j) can be specified
+     * 
+     * @param frames a number of frames that the reference frame Feed is offset.
+    */
+    void addOffset(int frames);
+    
 protected:
     /** Create internal structures and reset. */
     void init();
@@ -354,10 +371,13 @@ protected:
     
     /** Magnet points can stamp low or high distance into the matrix
      * in order to pull the alignment towards these points
+     * performance / reference
      */
     bool isMagnetWall(int,int);
-    int m_magnetSiz = 10; // size of the magnets in frames
+    int m_magnetSiz; // size of the magnets in frames
     vector<std::pair<int,int >> m_magnets; // performance,reference fixpoints in frames
+    
+    int m_offset;
     
 };
 
