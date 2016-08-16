@@ -78,9 +78,12 @@ Matcher::init()
     
     m_initialised = true;
     
-    // testing fixed fixpoint for clementi 6 cadenza (performance, reference)
-    m_magnets.push_back(std::make_pair((int) (5.590/m_params.hopTime), 
-            (int) (7.125/m_params.hopTime)));
+    // testing fixed fixpoint for canzonet/  clementi 6 cadenza (performance, reference)
+    //m_magnets.push_back(std::make_pair((int) (5.590/m_params.hopTime), 
+    //        (int) (2.125/m_params.hopTime)));
+
+    m_magnets.push_back(std::make_pair((int) (91.253/m_params.hopTime), 
+            (int) (113.000/m_params.hopTime)));
     
     for (auto point: m_magnets){
         int pIndex = point.second; //reference
@@ -349,8 +352,8 @@ Matcher::calcAdvance()
     for ( ; index < stop; index++) {
         
         distance_t distance;
-        if (isMagnetWall(m_frameCount,index)) {
-            distance = DISTANCE_MAX;
+        if (isMagnetWall(m_frameCount,index) >= 0) {
+            distance = (distance_t) isMagnetWall(m_frameCount,index);
         }else{            
             distance = m_metric.calcDistance
                 (m_features[frameIndex],
@@ -595,18 +598,17 @@ Matcher::printStats()
     }
 }
 
-bool Matcher::isMagnetWall(int frameCount, int index){
-    bool result = false;
+double Matcher::isMagnetWall(int frameCount, int index){
+    double result = -1;
     for (auto point: m_magnets){
         int pIndex = point.second; //reference
         int pFrameCount = point.first; //other
-        if (abs(index - pIndex) < 10 || abs(pFrameCount- frameCount) < 10){
-            if (abs(index - pIndex) < 10 && abs(pFrameCount- frameCount) < 10){
+        if (abs(index - pIndex) < m_magnetSiz || abs(pFrameCount- frameCount) < m_magnetSiz){
+            if (abs(index - pIndex) < m_magnetSiz && abs(pFrameCount- frameCount) < m_magnetSiz){
                 cerr << "Fixpoint at " << "other: " << pFrameCount << " reference: "  <<  pIndex << " passed." << endl;
-                //return 0;
-                return false; 
+                return 0;
             }else{
-                result = true;
+                result = DISTANCE_WALL;
             }
         }  
     }
