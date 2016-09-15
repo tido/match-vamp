@@ -342,9 +342,10 @@ Matcher::calcAdvance()
 
     for ( ; index < stop; index++) {
         
-        distance_t distance;
-        if (isMagnetWall(m_frameCount,index)) { // are we trying to sneak around a magnet ?
-            distance = DISTANCE_MAX;
+        distance_t distance ;
+        double magnetDist = distMagnetWall(m_frameCount,index);
+        if (magnetDist  >= 0) { // are we trying to sneak around a magnet ?
+            distance = (distance_t) magnetDist;
         }else{            
             distance = m_metric.calcDistance
                 (m_features[frameIndex],
@@ -601,17 +602,29 @@ void Matcher::addOffset(int frames){
     m_offset += frames; 
 }
     
-bool Matcher::isMagnetWall(int frameCount, int index){
-    bool result = false;
+double Matcher::distMagnetWall(int frameCount, int index){
+    double result = -1;
     for (auto point: m_magnets){
         int pIndex = point.second; //reference
         int pFrameCount = point.first; //other
+        
+        double wallGradLen= 1000.;
+        
+        //double distanceToWall = sqrt((index + m_offset - pIndex) * (index + m_offset - pIndex) +
+        //                        (pFrameCount - frameCount) * (pFrameCount - frameCount) );
+        
         if (abs(index + m_offset - pIndex) < 10 || abs(pFrameCount - frameCount) < 10){
             if (abs(index + m_offset - pIndex) < 10 && abs(pFrameCount - frameCount) < 10){
-                //cerr << "Fixpoint at " << "other: " << pFrameCount << " reference: "  <<  pIndex << " passed." << endl;
-                return false; 
+                cerr << "Fixpoint at " << "other: " << pFrameCount << " reference: "  <<  pIndex << " passed." << endl;
+                return -1; 
             }else{
-                result = true;
+                
+                result = DISTANCE_MAX / 2. + ( (double)  DISTANCE_MAX / 4.) * 
+                            (
+                            (min(( (double) abs(pFrameCount - frameCount)), wallGradLen) / wallGradLen)  + 
+                            (min(( (double) abs(index + m_offset - pIndex)),wallGradLen)  / wallGradLen)
+                            );
+                //cerr << result << endl;
             }
         }  
     }

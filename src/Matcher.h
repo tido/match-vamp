@@ -52,7 +52,7 @@ public:
 
         Parameters(double hopTime_) :
             hopTime(hopTime_),
-            blockTime(10.0),
+            blockTime(17.0),
             maxRunCount(3),
             diagonalWeight(2.0),
             magnets(std::vector<std::pair<int,int>> {})
@@ -373,7 +373,7 @@ protected:
      * in order to pull the alignment towards these points
      * performance / reference
      */
-    bool isMagnetWall(int,int);
+    double distMagnetWall(int,int);
     int m_magnetSiz; // size of the magnets in frames
     vector<std::pair<int,int >> m_magnets; // performance,reference fixpoints in frames
     
