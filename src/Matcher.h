@@ -52,7 +52,7 @@ public:
 
         Parameters(double hopTime_) :
             hopTime(hopTime_),
-            blockTime(17.0),
+            blockTime(10.0),
             maxRunCount(3),
             diagonalWeight(2.0),
             magnets(std::vector<std::pair<int,int>> {})
