@@ -593,13 +593,8 @@ Matcher::printStats()
 void Matcher::setMagnets( std::vector<std::pair<int, int>> points){
     m_magnets.clear();
     for (auto point: points){
-        if(m_firstPM){
-            m_magnets.push_back(point);
-            cerr << "Fixpoint at " << "other: " << point.second << "reference: "  << point.first << endl;
-        }else{
-            // we invert the fixpoint coordinates for the second matcher
-            m_magnets.push_back(make_pair(point.second,point.first));
-        }
+        m_magnets.push_back(point);
+        cerr << "Fixpoint at " << "other: " << point.second << "reference: "  << point.first << endl;
     }
 }
 
@@ -609,43 +604,36 @@ void Matcher::addOffset(int frames){
     
 double Matcher::distMagnetWall(int frameCount, int index){
     double result = -1;
+    int pIndex;
+    int pFrameCount;
     for (auto point: m_magnets){
-        int pIndex = point.first; //reference
-        int pFrameCount = point.second; //other
+        if(m_firstPM){
+            pIndex = point.first - m_offset; //reference
+            pFrameCount = point.second; //other
+        }else{
+            pIndex = point.second ; //reference
+            pFrameCount = point.first - m_offset; //other
+        }
 
         double wallGradLen= 1000.;
         
         //double distanceToWall = sqrt((index + m_offset - pIndex) * (index + m_offset - pIndex) +
         //                        (pFrameCount - frameCount) * (pFrameCount - frameCount) );
-        if(!m_firstPM){
-            if (abs(index + m_offset - pIndex) < 10 || abs(pFrameCount - frameCount) < 10){
-                if (abs(index + m_offset - pIndex) < 10 && abs(pFrameCount - frameCount) < 10){
-                    cerr << "Fixpoint at " << "other: " << pFrameCount << " reference: "  <<  pIndex << " passed." << endl;
-                    return -1; 
-                }else{
-                    result = DISTANCE_MAX / 2. + ( (double)  DISTANCE_MAX / 4.) * 
-                                (
-                                (min(( (double) abs(pFrameCount - frameCount)), wallGradLen) / wallGradLen)  + 
-                                (min(( (double) abs(index + m_offset - pIndex)),wallGradLen)  / wallGradLen)
-                                );
-                    //cerr << result << endl;
-                }
-            }
-        }else{
-            if (abs(index- pIndex) < 10 || abs(pFrameCount  + m_offset - frameCount) < 10){
-                if (abs(index - pIndex) < 10 && abs(pFrameCount + m_offset - frameCount) < 10){
-                    cerr << "Fixpoint at " << "other: " << pFrameCount << " reference: "  <<  pIndex << " passed." << endl;
-                    return -1; 
-                }else{
-                    result = DISTANCE_MAX / 2. + ( (double)  DISTANCE_MAX / 4.) * 
-                                (
-                                (min(( (double) abs(pFrameCount  + m_offset - frameCount)), wallGradLen) / wallGradLen)  + 
-                                (min(( (double) abs(index - pIndex)),wallGradLen)  / wallGradLen)
-                                );
-                    //cerr << result << endl;
-                }
+
+        if (abs(index - pIndex) < 10 || abs(pFrameCount - frameCount) < 10){
+            if (abs(index - pIndex) < 10 && abs(pFrameCount - frameCount) < 10){
+                cerr << "Fixpoint at " << "other: " << pFrameCount << " reference: "  <<  pIndex << " passed." << endl;
+                return -1; 
+            }else{
+                result = DISTANCE_MAX / 2. + ( (double)  DISTANCE_MAX / 4.) * 
+                            (
+                            (min(( (double) abs(pFrameCount - frameCount)), wallGradLen) / wallGradLen)  + 
+                            (min(( (double) abs(index - pIndex)),wallGradLen)  / wallGradLen)
+                            );
+                //cerr << result << endl;
             }
         }
+        
     }
     return result;
 }
