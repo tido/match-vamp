@@ -625,7 +625,7 @@ double Matcher::distMagnetWall(int frameCount, int index){
                 cerr << "Fixpoint at " << "other: " << pFrameCount << " reference: "  <<  pIndex << " passed." << endl;
                 return -1; 
             }else{
-                result = DISTANCE_MAX / 2. + ( (double)  DISTANCE_MAX / 4.) * 
+                result = DISTANCE_WALL / 2. + ( (double)  DISTANCE_WALL / 4.) * 
                             (
                             (min(( (double) abs(pFrameCount - frameCount)), wallGradLen) / wallGradLen)  + 
                             (min(( (double) abs(index - pIndex)),wallGradLen)  / wallGradLen)

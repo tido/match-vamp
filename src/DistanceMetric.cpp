@@ -39,6 +39,20 @@ DistanceMetric::scaleIntoRange(double distance)
     return uint8_t(scaled);
 }
 
+template <> uint16_t
+DistanceMetric::scaleIntoRange(double distance)
+{
+    double scaled = m_params.scale * distance;
+    if (scaled < 0) {
+        scaled = 0;
+    }
+    if (scaled > DISTANCE_MAX) {
+        scaled = DISTANCE_MAX;
+        ++m_overcount;
+    }
+    return uint16_t(scaled);
+}
+
 template <> float
 DistanceMetric::scaleIntoRange(double distance)
 {
