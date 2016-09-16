@@ -33,7 +33,7 @@ typedef uint8_t distance_t;
 /// What to cast a distance_t to when printing it (to avoid printing as char)
 typedef int distance_print_t;
 
-const distance_t DISTANCE_MAX = 0x9e;
+const distance_t DISTANCE_MAX = 0x40; // 0xfe/5 = 0x32
 const distance_t DISTANCE_WALL = 0xfe;
 const distance_t INVALID_DISTANCE = 0xff;
 
