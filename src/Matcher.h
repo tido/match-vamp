@@ -393,7 +393,7 @@ protected:
     int m_magnetSlide; // number of frames with gradual decrease towards the magnet 
     vector<std::pair<int,int >> m_magnets; // performance,reference fixpoints in frames
     
-    int m_offset;
+    int m_offset; // offset for magnet points
     
 };
 

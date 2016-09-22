@@ -46,6 +46,7 @@ Matcher::Matcher(Parameters parameters, DistanceMetric::Parameters dparams,
     m_runCount = 0;
     m_blockSize = 0;
     m_distXSize = 0;
+    m_offset = 0;
 
     m_blockSize = int(m_params.blockTime / m_params.hopTime + 0.5);
     m_magnetSize = int(m_params.magnetTolTime / m_params.hopTime);
@@ -80,7 +81,6 @@ Matcher::init()
     m_frameCount = 0;
     m_runCount = 0;
     
-    m_offset = 0;
     setMagnets(m_params.magnets);
 
     m_initialised = true;
@@ -603,6 +603,8 @@ void Matcher::setMagnets( std::vector<std::pair<int, int>> points){
 
 void Matcher::addOffset(int frames){
     m_offset += frames; 
+   // cerr << "Offset plus " << frames << ", now at " << m_offset << endl;
+
 }
     
 double Matcher::distMagnetWall(int frameCount, int index){
