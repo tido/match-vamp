@@ -48,9 +48,13 @@ Matcher::Matcher(Parameters parameters, DistanceMetric::Parameters dparams,
     m_distXSize = 0;
 
     m_blockSize = int(m_params.blockTime / m_params.hopTime + 0.5);
-#ifdef DEBUG_MATCHER
-    cerr << "Matcher: m_blockSize = " << m_blockSize << endl;
-#endif
+    m_magnetSize = int(m_params.magnetTolTime / m_params.hopTime);
+    m_magnetSlide = int(m_params.magnetSlideTime / m_params.hopTime);
+    
+    #ifdef DEBUG_MATCHER
+        cerr << "Matcher: m_blockSize = " << m_blockSize << endl;
+    #endif
+    
     
     m_initialised = false;
 } 
@@ -77,8 +81,6 @@ Matcher::init()
     m_runCount = 0;
     
     m_offset = 0;
-    m_magnetSiz = 10;
-    m_magnetGrad = 1000;
     setMagnets(m_params.magnets);
 
     m_initialised = true;
@@ -623,19 +625,19 @@ double Matcher::distMagnetWall(int frameCount, int index){
 
         int idxDist = abs(index - pIndex);
         int frameDist = abs(pFrameCount - frameCount);
-        if ( idxDist < m_magnetSiz || frameDist < m_magnetSiz){
-            if (idxDist < m_magnetSiz && frameDist < m_magnetSiz){
+        if ( idxDist < m_magnetSize || frameDist < m_magnetSize){
+            if (idxDist < m_magnetSize && frameDist < m_magnetSize){
                 cerr << "Fixpoint at " << "other: " << pFrameCount << " reference: "  <<  pIndex << " passed." << endl;
                 return -1; 
             }else{
                 result = DISTANCE_MAX/ 2;
                 
-                if (idxDist < m_magnetGrad){
-                    result += DISTANCE_MAX / 4 * (idxDist / m_magnetGrad) ;
+                if (idxDist < m_magnetSlide){
+                    result += DISTANCE_MAX / 4 * (idxDist / m_magnetSlide) ;
                 }else result += DISTANCE_MAX / 4;
 
-                if (frameDist < m_magnetGrad){
-                     result += DISTANCE_MAX / 4 * (frameDist / m_magnetGrad) ;
+                if (frameDist < m_magnetSlide){
+                     result += DISTANCE_MAX / 4 * (frameDist / m_magnetSlide) ;
                 }else result += DISTANCE_MAX / 4;
             }
         }

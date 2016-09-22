@@ -55,6 +55,8 @@ public:
             blockTime(10.0),
             maxRunCount(3),
             diagonalWeight(2.0),
+            magnetTolTime(0.08),
+            magnetSlideTime(20.),
             magnets(std::vector<std::pair<int,int>> {})
         {}
 
@@ -87,6 +89,19 @@ public:
          *  might use 1.0 or something close to it.
          */
         double diagonalWeight;
+        
+        /** Tolerance time/area around a magnet fixpoint in seconds. Determines the leeway 
+         * around the fixpoint the optimal path can take without penalty.
+         * A couple of frames (0.02 - 0.1 s) is a good estimate.
+         */
+        double magnetTolTime;
+        
+        /** Time around a magnet fixpoint in seconds where penalty rises gradually.
+         * Maximum penalty is given outside of this area. This effectively determines
+         * the reach of the magnet and should be large enough to allow for 
+         * e.g. branching adjustments to be made. (e.g. 10-60s)
+         */
+        double magnetSlideTime;
         
         std::vector<std::pair<int,int>> magnets;
     };
@@ -374,8 +389,8 @@ protected:
      * performance / reference
      */
     double distMagnetWall(int,int);
-    int m_magnetSiz; // size of the magnets in frames
-    int m_magnetGrad; // number of frames with gradual decrease towards the magnet 
+    int m_magnetSize; // size of the magnets in frames
+    int m_magnetSlide; // number of frames with gradual decrease towards the magnet 
     vector<std::pair<int,int >> m_magnets; // performance,reference fixpoints in frames
     
     int m_offset;
