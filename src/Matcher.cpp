@@ -628,16 +628,17 @@ double Matcher::distMagnetWall(int frameCount, int index){
                 cerr << "Fixpoint at " << "other: " << pFrameCount << " reference: "  <<  pIndex << " passed." << endl;
                 return -1; 
             }else{
-                result = DISTANCE_MAX/ 2.;
-                    if ( idxDist < m_magnetGrad || frameDist < m_magnetGrad){
-                        result += DISTANCE_MAX / 4. * 
-                            ( min( frameDist, m_magnetGrad) / m_magnetGrad  + 
-                              min( idxDist,m_magnetGrad)  / m_magnetGrad );
-                    }
-                //cerr << result << endl;
+                result = DISTANCE_MAX/ 2;
+                
+                if (idxDist < m_magnetGrad){
+                    result += DISTANCE_MAX / 4 * (idxDist / m_magnetGrad) ;
+                }else result += DISTANCE_MAX / 4;
+
+                if (frameDist < m_magnetGrad){
+                     result += DISTANCE_MAX / 4 * (frameDist / m_magnetGrad) ;
+                }else result += DISTANCE_MAX / 4;
             }
         }
-        
     }
     return result;
 }
