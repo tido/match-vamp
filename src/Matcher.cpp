@@ -78,6 +78,7 @@ Matcher::init()
     
     m_offset = 0;
     m_magnetSiz = 10;
+    m_magnetGrad = 1000;
     setMagnets(m_params.magnets);
 
     m_initialised = true;
@@ -604,6 +605,11 @@ void Matcher::addOffset(int frames){
     
 double Matcher::distMagnetWall(int frameCount, int index){
     double result = -1;
+    #ifdef USE_COMPACT_TYPES
+        // we can't use magnetpoints with compact type right now. For this to work
+        // it needs at least uint16 precision
+        return result;
+    #endif
     int pIndex;
     int pFrameCount;
     for (auto point: m_magnets){
@@ -615,21 +621,19 @@ double Matcher::distMagnetWall(int frameCount, int index){
             pFrameCount = point.first - m_offset; //other
         }
 
-        double wallGradLen= 1000.;
-        
-        //double distanceToWall = sqrt((index + m_offset - pIndex) * (index + m_offset - pIndex) +
-        //                        (pFrameCount - frameCount) * (pFrameCount - frameCount) );
-
-        if (abs(index - pIndex) < 10 || abs(pFrameCount - frameCount) < 10){
-            if (abs(index - pIndex) < 10 && abs(pFrameCount - frameCount) < 10){
+        int idxDist = abs(index - pIndex);
+        int frameDist = abs(pFrameCount - frameCount);
+        if ( idxDist < m_magnetSiz || frameDist < m_magnetSiz){
+            if (idxDist < m_magnetSiz && frameDist < m_magnetSiz){
                 cerr << "Fixpoint at " << "other: " << pFrameCount << " reference: "  <<  pIndex << " passed." << endl;
                 return -1; 
             }else{
-                result = DISTANCE_WALL / 2. + ( (double)  DISTANCE_WALL / 4.) * 
-                            (
-                            (min(( (double) abs(pFrameCount - frameCount)), wallGradLen) / wallGradLen)  + 
-                            (min(( (double) abs(index - pIndex)),wallGradLen)  / wallGradLen)
-                            );
+                result = DISTANCE_MAX/ 2.;
+                    if ( idxDist < m_magnetGrad || frameDist < m_magnetGrad){
+                        result += DISTANCE_MAX / 4. * 
+                            ( min( frameDist, m_magnetGrad) / m_magnetGrad  + 
+                              min( idxDist,m_magnetGrad)  / m_magnetGrad );
+                    }
                 //cerr << result << endl;
             }
         }

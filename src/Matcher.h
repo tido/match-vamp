@@ -375,6 +375,7 @@ protected:
      */
     double distMagnetWall(int,int);
     int m_magnetSiz; // size of the magnets in frames
+    int m_magnetGrad; // number of frames with gradual decrease towards the magnet 
     vector<std::pair<int,int >> m_magnets; // performance,reference fixpoints in frames
     
     int m_offset;
