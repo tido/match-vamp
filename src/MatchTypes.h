@@ -27,14 +27,21 @@
 /// A single value in a feature vector
 typedef float featurebin_t;
 
+#ifdef USE_MAGNET_POINTS
 /// The distance between two feature vectors
+typedef uint16_t distance_t;
+const distance_t DISTANCE_MAX = 0xfe;
+const distance_t DISTANCE_WALL = 0xff00;
+const distance_t INVALID_DISTANCE = 0xffff;
+#else
 typedef uint8_t distance_t;
+const distance_t DISTANCE_MAX = 0xfe;
+const distance_t DISTANCE_WALL = DISTANCE_MAX;
+const distance_t INVALID_DISTANCE = 0xff;
+#endif
 
 /// What to cast a distance_t to when printing it (to avoid printing as char)
 typedef int distance_print_t;
-
-const distance_t DISTANCE_MAX = 0xfe;
-const distance_t INVALID_DISTANCE = 0xff;
 
 /// The integrated distance (path cost) from the origin to a given point
 typedef uint32_t pathcost_t;
@@ -66,6 +73,7 @@ typedef float distance_t;
 typedef distance_t distance_print_t;
 
 const float DISTANCE_MAX = FLT_MAX;
+const float DISTANCE_WALL = DISTANCE_MAX;
 const float INVALID_DISTANCE = -1.f;
 
 /// The integrated distance (path cost) from the origin to a given point

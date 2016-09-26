@@ -388,7 +388,7 @@ protected:
      * in order to pull the alignment towards these points
      * performance / reference
      */
-    double distMagnetWall(int,int);
+    distance_t distMagnetWall(int,int);
     int m_magnetSize; // size of the magnets in frames
     int m_magnetSlide; // number of frames with gradual decrease towards the magnet 
     vector<std::pair<int,int >> m_magnets; // performance,reference fixpoints in frames

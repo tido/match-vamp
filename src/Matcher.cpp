@@ -345,11 +345,8 @@ Matcher::calcAdvance()
 
     for ( ; index < stop; index++) {
         
-        distance_t distance ;
-        double magnetDist = distMagnetWall(m_frameCount,index);
-        if (magnetDist  >= 0) { // are we trying to sneak around a magnet ?
-            distance = (distance_t) magnetDist;
-        }else{            
+        distance_t distance = distMagnetWall(m_frameCount,index);
+        if (distance == INVALID_DISTANCE) { // are we trying to sneak around a magnet ?       
             distance = m_metric.calcDistance
                 (m_features[frameIndex],
                  m_otherMatcher->m_features[index % m_blockSize]);
@@ -597,7 +594,9 @@ void Matcher::setMagnets( std::vector<std::pair<int, int>> points){
     m_magnets.clear();
     for (auto point: points){
         m_magnets.push_back(point);
-        cerr << "Fixpoint at " << "other: " << point.second << "reference: "  << point.first << endl;
+        #ifdef DEBUG_MATCHER
+            cerr << "Fixpoint at " << "other: " << point.second << "reference: "  << point.first << endl;
+        #endif
     }
 }
 
@@ -607,15 +606,15 @@ void Matcher::addOffset(int frames){
 
 }
     
-double Matcher::distMagnetWall(int frameCount, int index){
-    double result = -1;
-    #ifdef USE_COMPACT_TYPES
-        // we can't use magnetpoints with compact type right now. For this to work
-        // it needs at least uint16 precision
+distance_t Matcher::distMagnetWall(int frameCount, int index){
+    distance_t result = INVALID_DISTANCE;
+    #ifndef USE_MAGNET_POINTS
         return result;
     #endif
+    
     int pIndex;
     int pFrameCount;
+    
     for (auto point: m_magnets){
         if(m_firstPM){
             pIndex = point.first - m_offset; //reference
@@ -629,18 +628,20 @@ double Matcher::distMagnetWall(int frameCount, int index){
         int frameDist = abs(pFrameCount - frameCount);
         if ( idxDist < m_magnetSize || frameDist < m_magnetSize){
             if (idxDist < m_magnetSize && frameDist < m_magnetSize){
-                cerr << "Fixpoint at " << "other: " << pFrameCount << " reference: "  <<  pIndex << " passed." << endl;
-                return -1; 
+                #ifdef DEBUG_MATCHER
+                    cerr << "Fixpoint at " << "other: " << pFrameCount << " reference: "  <<  pIndex << " passed." << endl;
+                #endif
+                return INVALID_DISTANCE; 
             }else{
-                result = DISTANCE_MAX/ 2;
+                result = DISTANCE_WALL/ 2;
                 
                 if (idxDist < m_magnetSlide){
-                    result += DISTANCE_MAX / 4 * (idxDist / m_magnetSlide) ;
-                }else result += DISTANCE_MAX / 4;
+                    result += DISTANCE_WALL / 4 * (idxDist / m_magnetSlide) ;
+                }else result += DISTANCE_WALL / 4;
 
                 if (frameDist < m_magnetSlide){
-                     result += DISTANCE_MAX / 4 * (frameDist / m_magnetSlide) ;
-                }else result += DISTANCE_MAX / 4;
+                     result += DISTANCE_WALL / 4 * (frameDist / m_magnetSlide) ;
+                }else result += DISTANCE_WALL / 4;
             }
         }
     }
