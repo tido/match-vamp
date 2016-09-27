@@ -299,11 +299,18 @@ public:
     void setMagnets(std::vector<std::pair<int, int>> points);
     
     /** To keep track with the frame feed and absolute magnet positions,
-     * an offset of the other matcher (j) can be specified
+     * an offset of the primary matcher (i) can be specified (e.g. for silence)
      * 
      * @param frames a number of frames that the reference frame Feed is offset.
     */
-    void addOffset(int frames);
+    void addIOffset(int frames);
+    
+    /** To keep track with the frame feed and absolute magnet positions,
+     * an offset of the other matcher (j) can be specified (e.g. for branches)
+     * 
+     * @param frames a number of frames that the reference frame Feed is offset.
+    */
+    void addJOffset(int frames);
     
 protected:
     /** Create internal structures and reset. */
@@ -393,7 +400,8 @@ protected:
     int m_magnetSlide; // number of frames with gradual decrease towards the magnet 
     vector<std::pair<int,int >> m_magnets; // performance,reference fixpoints in frames
     
-    int m_offset; // offset for magnet points
+    int m_iOffset; // offset for magnet points
+    int m_jOffset; // offset for magnet points
     
 };
 
