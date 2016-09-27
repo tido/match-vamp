@@ -602,13 +602,24 @@ void Matcher::setMagnets( std::vector<std::pair<int, int>> points){
 }
 
 void Matcher::addJOffset(int frames){
-    m_jOffset += frames; 
-   // cerr << "Offset plus " << frames << ", now at " << m_offset << endl;
+    //m_jOffset += frames; 
+    
+    // only forward points that lie after the current position
+    for (auto point: m_magnets){
+        if(m_firstPM){
+            if (point.second > m_frameCount) point.second -= m_jOffset; 
+        }else{
+            if (point.second > m_otherMatcher->m_frameCount)
+                point.second -= m_jOffset;
+        }
+    }
 
 }
 void Matcher::addIOffset(int frames){
     m_iOffset += frames; 
-   // cerr << "Offset plus " << frames << ", now at " << m_offset << endl;
+    #ifdef DEBUG_MATCHER
+        // cerr << "Offset plus " << frames << ", now at " << m_offset << endl;
+    #endif
 
 }
     
@@ -623,10 +634,10 @@ distance_t Matcher::distMagnetWall(int frameCount, int index){
     
     for (auto point: m_magnets){
         if(m_firstPM){
-            pIndex = point.first - m_iOffset; //reference
-            pFrameCount = point.second - m_jOffset; //other
+            pIndex = point.first - m_iOffset; //other
+            pFrameCount = point.second ;//- m_jOffset; //reference
         }else{
-            pIndex = point.second - m_jOffset; //reference
+            pIndex = point.second ;//- m_jOffset; //reference
             pFrameCount = point.first - m_iOffset; //other
         }
 
