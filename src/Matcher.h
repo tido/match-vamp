@@ -297,7 +297,7 @@ public:
     *         to an absolute frame position in the other Matcher (reference)
     */
     void setMagnets(std::vector<std::pair<int, int>> points);
-    
+        
     /** To keep track with the frame feed and absolute magnet positions,
      * an offset of the primary matcher (i) can be specified (e.g. for silence)
      * 

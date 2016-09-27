@@ -602,24 +602,31 @@ void Matcher::setMagnets( std::vector<std::pair<int, int>> points){
 }
 
 void Matcher::addJOffset(int frames){
-    //m_jOffset += frames; 
     
+    //m_jOffset += frames; 
+    int curPos;
+    if(m_firstPM) curPos = m_frameCount;
+    else curPos = m_otherMatcher->m_frameCount;
+       
     // only forward points that lie after the current position
-    for (auto point: m_magnets){
-        if(m_firstPM){
-            if (point.second > m_frameCount) point.second -= m_jOffset; 
-        }else{
-            if (point.second > m_otherMatcher->m_frameCount)
-                point.second -= m_jOffset;
-        }
+    cerr << "addJOffset " <<endl ;
+    // the auto type defaults to a copy, which cannot be changed in place
+    for ( std::pair<int,int > & point: m_magnets){
+       if (point.second > curPos + frames) {
+            cerr << "JOffset minus " << frames << ",was "<<  point.second ;
+            point.second -= frames;
+            cerr <<" , now at " << point.second << endl;
+       }
     }
-
+    cerr << "Magnet points: " <<endl ;
+    for (auto point: m_magnets){
+        cerr << "JOffset now at "<< point.second << " ," << point.first << endl;
+    }
+    
 }
 void Matcher::addIOffset(int frames){
     m_iOffset += frames; 
-    #ifdef DEBUG_MATCHER
-        // cerr << "Offset plus " << frames << ", now at " << m_offset << endl;
-    #endif
+    //cerr << "IOffset plus " << frames << ", now at " << m_iOffset << endl;
 
 }
     
@@ -645,9 +652,7 @@ distance_t Matcher::distMagnetWall(int frameCount, int index){
         int frameDist = abs(pFrameCount - frameCount);
         if ( idxDist < m_magnetSize || frameDist < m_magnetSize){
             if (idxDist < m_magnetSize && frameDist < m_magnetSize){
-                #ifdef DEBUG_MATCHER
-                    cerr << "Fixpoint at " << "other: " << pFrameCount << " reference: "  <<  pIndex << " passed." << endl;
-                #endif
+                cerr << "Fixpoint at " << "other: " << pFrameCount << " reference: "  <<  pIndex << " passed." << endl;
                 return INVALID_DISTANCE; 
             }else{
                 result = DISTANCE_WALL/ 2;
