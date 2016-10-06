@@ -26,6 +26,7 @@
 using namespace std;
 
 //#define DEBUG_MATCHER 1
+
 //#define PERFORM_ERROR_CHECKS 1
 
 Matcher::Matcher(Parameters parameters, DistanceMetric::Parameters dparams,
@@ -609,25 +610,26 @@ void Matcher::addJOffset(int frames){
     else curPos = m_otherMatcher->m_frameCount;
        
     // only forward points that lie after the current position
-    cerr << "addJOffset " <<endl ;
     // the auto type defaults to a copy, which cannot be changed in place
     for ( std::pair<int,int > & point: m_magnets){
        if (point.second > curPos + frames) {
-            cerr << "JOffset minus " << frames << ",was "<<  point.second ;
             point.second -= frames;
-            cerr <<" , now at " << point.second << endl;
        }
     }
-    cerr << "Magnet points: " <<endl ;
-    for (auto point: m_magnets){
-        cerr << "JOffset now at "<< point.second << " ," << point.first << endl;
-    }
-    
+    #ifdef DEBUG_MATCHER
+        cerr << "Magnet points: " <<endl ;
+        for (auto point: m_magnets){
+            cerr << "JOffset now at "<< point.second << " ," << point.first << endl;
+        }
+    #endif
 }
 void Matcher::addIOffset(int frames){
     m_iOffset += frames; 
-    //cerr << "IOffset plus " << frames << ", now at " << m_iOffset << endl;
-
+    #ifdef DEBUG_MATCHER
+        cerr << "IOffset plus " << frames << ", now at " << m_iOffset << endl;
+    #endif
+    //IOffset for now can stay with this naive approach
+    
 }
     
 distance_t Matcher::distMagnetWall(int frameCount, int index){
@@ -652,7 +654,9 @@ distance_t Matcher::distMagnetWall(int frameCount, int index){
         int frameDist = abs(pFrameCount - frameCount);
         if ( idxDist < m_magnetSize || frameDist < m_magnetSize){
             if (idxDist < m_magnetSize && frameDist < m_magnetSize){
-                cerr << "Fixpoint at " << "other: " << pFrameCount << " reference: "  <<  pIndex << " passed." << endl;
+                #ifdef DEBUG_MATCHER
+                    cerr << "Fixpoint at " << "other: " << pFrameCount << " reference: "  <<  pIndex << " passed." << endl;
+                #endif
                 return INVALID_DISTANCE; 
             }else{
                 result = DISTANCE_WALL/ 2;
