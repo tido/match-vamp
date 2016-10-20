@@ -25,7 +25,7 @@
 
 using namespace std;
 
-//#define DEBUG_MATCHER 1
+// #define DEBUG_MATCHER 1
 
 //#define PERFORM_ERROR_CHECKS 1
 
@@ -595,7 +595,8 @@ Matcher::printStats()
 void Matcher::setMagnets( std::vector<std::pair<int, int>> points){
     m_magnets.clear();
     for (auto point: points){
-        m_magnets.push_back(point);
+        // magnet points cannot be at position 0
+        m_magnets.push_back(make_pair(max(point.first,m_magnetSize+1),max(point.second,m_magnetSize + 1)));
         #ifdef DEBUG_MATCHER
             cerr << "Fixpoint at " << "other: " << point.second << "reference: "  << point.first << endl;
         #endif
@@ -618,8 +619,9 @@ void Matcher::addJOffset(int frames){
     }
     #ifdef DEBUG_MATCHER
         cerr << "Magnet points: " <<endl ;
+        cerr << "JOffset plus" << frames << " from" << curPos + frames << endl;
         for (auto point: m_magnets){
-            cerr << "JOffset now at "<< point.second << " ," << point.first << endl;
+            cerr << "Fixpoint now at "<< point.second << ", " << point.first << endl;
         }
     #endif
 }
