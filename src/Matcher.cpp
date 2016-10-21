@@ -25,7 +25,7 @@
 
 using namespace std;
 
-// #define DEBUG_MATCHER 1
+//#define DEBUG_MATCHER 1
 
 //#define PERFORM_ERROR_CHECKS 1
 
@@ -594,11 +594,11 @@ Matcher::printStats()
 
 void Matcher::setMagnets( std::vector<std::pair<int, int>> points){
     m_magnets.clear();
-    for (auto point: points){
-        // magnet points cannot be at position 0
-        m_magnets.push_back(make_pair(max(point.first,m_magnetSize+1),max(point.second,m_magnetSize + 1)));
+    
+    for (std::pair<int, int> point: points){
+        m_magnets.push_back(point);
         #ifdef DEBUG_MATCHER
-            cerr << "Fixpoint at " << "other: " << point.second << "reference: "  << point.first << endl;
+            cerr << "Fixpoint at " << "other: " << second << " reference: " << first << endl;
         #endif
     }
 }
@@ -619,7 +619,7 @@ void Matcher::addJOffset(int frames){
     }
     #ifdef DEBUG_MATCHER
         cerr << "Magnet points: " <<endl ;
-        cerr << "JOffset plus" << frames << " from" << curPos + frames << endl;
+        cerr << "JOffset plus " << frames << " from " << curPos + frames << endl;
         for (auto point: m_magnets){
             cerr << "Fixpoint now at "<< point.second << ", " << point.first << endl;
         }
@@ -639,6 +639,10 @@ distance_t Matcher::distMagnetWall(int frameCount, int index){
     #ifndef USE_MAGNET_POINTS
         return result;
     #endif
+
+    if ((frameCount == 0)  || (index == 0)) {
+        return result;
+    } 
     
     int pIndex;
     int pFrameCount;
