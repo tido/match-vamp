@@ -51,7 +51,8 @@ Matcher::Matcher(Parameters parameters, DistanceMetric::Parameters dparams,
     m_jOffset = 0;
 
     m_blockSize = int(m_params.blockTime / m_params.hopTime + 0.5);
-    m_magnetSize = int(m_params.magnetTolTime / m_params.hopTime);
+    m_magnetTol = int(m_params.magnetTolTime / m_params.hopTime);
+    m_magnetWall = 1;
     m_magnetSlide = int(m_params.magnetSlideTime / m_params.hopTime);
     
     #ifdef DEBUG_MATCHER
@@ -656,26 +657,29 @@ distance_t Matcher::distMagnetWall(int frameCount, int index){
             pFrameCount = point.first - m_iOffset; //other
         }
 
+        // Are we close to a magnet?
         int idxDist = abs(index - pIndex);
         int frameDist = abs(pFrameCount - frameCount);
-        if ( idxDist < m_magnetSize || frameDist < m_magnetSize){
-            if (idxDist < m_magnetSize && frameDist < m_magnetSize){
-                #ifdef DEBUG_MATCHER
-                    cerr << "Fixpoint at " << "other: " << pFrameCount << " reference: "  <<  pIndex << " passed." << endl;
-                #endif
-                return INVALID_DISTANCE; 
-            }else{
-                result = DISTANCE_WALL/ 2;
-                
-                if (idxDist < m_magnetSlide){
-                    result += DISTANCE_WALL / 4 * (idxDist / m_magnetSlide) ;
-                }else result += DISTANCE_WALL / 4;
 
-                if (frameDist < m_magnetSlide){
-                     result += DISTANCE_WALL / 4 * (frameDist / m_magnetSlide) ;
-                }else result += DISTANCE_WALL / 4;
-            }
+        // If we hit a magnet, provide for easy passage immediately
+        if (idxDist < m_magnetTol && frameDist < m_magnetTol){
+            #ifdef DEBUG_MATCHER
+                cerr << "Fixpoint at " << "other: " << pFrameCount << " reference: "  <<  pIndex << " passed." << endl;
+            #endif
+            return INVALID_DISTANCE; 
         }
+
+        // If not, we calculate a wall height if we are close
+        if (idxDist < m_magnetWall || frameDist < m_magnetWall){
+            if (idxDist < m_magnetSlide){
+                result = (distance_t) (DISTANCE_WALL * ( 0.5 + 0.5 * (idxDist / m_magnetSlide)));
+            }else result = (distance_t) (DISTANCE_WALL);
+
+            if (frameDist < m_magnetSlide){
+                result = (distance_t) (DISTANCE_WALL * ( 0.5 + 0.5 * (frameDist / m_magnetSlide)));
+            }else result = (distance_t) (DISTANCE_WALL);
+        }
+
     }
     return result;
 }

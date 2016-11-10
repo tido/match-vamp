@@ -396,7 +396,9 @@ protected:
      * performance / reference
      */
     distance_t distMagnetWall(int,int);
-    int m_magnetSize; // size of the magnets in frames
+    int m_magnetTol; // magnet tolerance area where path can pass freely in frames
+    int m_magnetWall; // thickness of walls in frames, thicker walls incur higher
+                      // penalty for missing magmnts
     int m_magnetSlide; // number of frames with gradual decrease towards the magnet 
     vector<std::pair<int,int >> m_magnets; // performance,reference fixpoints in frames
     
