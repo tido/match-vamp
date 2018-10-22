@@ -274,3 +274,26 @@ FeatureExtractor::scaleMags(const vector<float> &mags)
     return scaled;
 }
 
+
+std::vector<float> 
+FeatureExtractor::getInverseScaledFreqMap (){
+    double ratio = 440.f / m_params.referenceFrequency ; 
+    double binWidth = double(m_params.sampleRate) / m_params.fftSize;
+    
+    vector<float> invFreqMap (m_featureSize, -1.0);
+    
+    for (int i=1; i < (int) m_freqMap.size(); i++){
+        double thisFreq = i * binWidth * ratio;
+        int thisFeatureBin = m_freqMap[i];
+        
+        if (thisFeatureBin > -1 && (thisFreq > invFreqMap[thisFeatureBin])) invFreqMap[thisFeatureBin] = (float) thisFreq;
+    }
+    
+    
+    cerr << "invFreqMap: " ;
+    for (auto freq: invFreqMap) cerr <<" " << freq ;
+    cerr << endl ;
+    
+    return invFreqMap;
+}
+

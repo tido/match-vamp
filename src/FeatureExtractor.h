@@ -146,6 +146,16 @@ public:
      */
     feature_t process(const float *carray);
     
+    // std::vector<int> getScaledFreqMap ();
+    
+    
+    /* 
+     * Return an array containing the top frequency associated with every 
+     * feature bin. This will be adjusted to the input freq parameter if 
+     * provided. 
+     */
+    std::vector<float> getInverseScaledFreqMap ();
+        
 protected:
     /** Make either standard or chroma map, depending on m_params */
     void makeFreqMap();
