@@ -155,6 +155,8 @@ public:
      * provided. 
      */
     std::vector<float> getInverseScaledFreqMap ();
+    
+    std::vector<int> getInverseMidiMap ();
         
 protected:
     /** Make either standard or chroma map, depending on m_params */

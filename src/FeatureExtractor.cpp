@@ -297,3 +297,27 @@ FeatureExtractor::getInverseScaledFreqMap (){
     return invFreqMap;
 }
 
+std::vector<int> 
+FeatureExtractor::getInverseMidiMap (){
+    double refFreq = 440.; // See above -- *not* the parameter!
+    double binWidth = double(m_params.sampleRate) / m_params.fftSize;
+    int crossoverBin = int(2 / (pow(2, 1/12.0) - 1));
+    int crossoverMidi = int(log(crossoverBin * binWidth / refFreq)/
+                            log(2.0) * 12 + 69 + 0.5);
+        
+    
+    
+    vector<int> invMidiMap (m_featureSize, -1);
+    
+    
+    // TODO: approximate notes for the lower bins? 
+    //       determine bin resolution 
+    
+    for (int i=1; i < (int) invMidiMap.size(); i++) {
+        if ( i > crossoverBin){
+            invMidiMap[i] = i - crossoverBin + crossoverMidi;
+        }
+    }
+    
+    return invMidiMap;
+}
