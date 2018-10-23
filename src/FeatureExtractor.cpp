@@ -289,10 +289,9 @@ FeatureExtractor::getInverseScaledFreqMap (){
         if (thisFeatureBin > -1 && (thisFreq > invFreqMap[thisFeatureBin])) invFreqMap[thisFeatureBin] = (float) thisFreq;
     }
     
-    
-    cerr << "invFreqMap: " ;
-    for (auto freq: invFreqMap) cerr <<" " << freq ;
-    cerr << endl ;
+    //cerr << "invFreqMap: " ;
+    //for (auto freq: invFreqMap) cerr <<" " << freq ;
+    //cerr << endl ;
     
     return invFreqMap;
 }
@@ -304,15 +303,10 @@ FeatureExtractor::getInverseMidiMap (){
     int crossoverBin = int(2 / (pow(2, 1/12.0) - 1));
     int crossoverMidi = int(log(crossoverBin * binWidth / refFreq)/
                             log(2.0) * 12 + 69 + 0.5);
-        
-    
-    
+
     vector<int> invMidiMap (m_featureSize, -1);
     
-    
-    // TODO: approximate notes for the lower bins? 
-    //       determine bin resolution 
-    
+    // only return note names for MIDI bins
     for (int i=1; i < (int) invMidiMap.size(); i++) {
         if ( i > crossoverBin){
             invMidiMap[i] = i - crossoverBin + crossoverMidi;
