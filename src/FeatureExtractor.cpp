@@ -6,7 +6,7 @@
 
     Centre for Digital Music, Queen Mary, University of London.
     Copyright (c) 2007-2015 Simon Dixon, Chris Cannam, and Queen Mary
-    University of London, Copyright (c) 2014-2015 Tido GmbH.
+    University of London, Copyright (c) 2014-2018 Tido GmbH.
     
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License as
